@@ -68,7 +68,7 @@ def make_marker_image():
 # Mesh files: find the ROBOTIS STL meshes and give MuJoCo full paths.
 # Relative meshdir paths break when the robot file is included from another folder.
 def find_mesh_dir():
-    candidates = [FOLDER / "assets"] + sorted(FOLDER.parent.glob("robotis_mujoco_menagerie*"))
+    candidates = [FOLDER, FOLDER / "assets"] + sorted(FOLDER.parent.glob("robotis_mujoco_menagerie*"))
     for root in candidates:
         if (root / "waffle_pi_base.stl").exists():
             return root
