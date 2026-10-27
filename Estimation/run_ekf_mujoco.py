@@ -62,6 +62,7 @@ def simulate(start = (3.325,1.6,np.pi/2)):
     last = np.array([data.qpos[qR], data.qpos[qL]])
     log = {"t": [], "e": [], "sigma": [], "nis": []}
 
+    rng = np.random.default_rng(0)
     step = 0
     while data.time < T_END:
         t = data.time
@@ -84,6 +85,10 @@ def simulate(start = (3.325,1.6,np.pi/2)):
             renderer.update_scene(data, camera="cam")
             z = marker_range_bearing(renderer.render())
             if z is not None:
+                #simulated camera noise for now
+                z = (z[0] + rng.normal(0,0.02), z[1] + rng.normal(0, np.deg2rad(2)))
+                #trust further readings less
+                ekf.R_rb = np.diag([0.02**2 + (0.01 * z[0])**2, np.deg2rad(2)**2])
                 nu, S = ekf.update_range_bearing(z, (MARKER_X, MARKER_Y))
                 log["nis"].append(nu @ np.linalg.solve(S, nu))
         
