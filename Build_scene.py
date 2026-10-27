@@ -65,18 +65,75 @@ def make_marker_image():
 
 # Camera & LiDAR to copy of ROBOTIS robot (add elements to allow image production)
 
+# Mesh files: find the ROBOTIS STL meshes and give MuJoCo full paths.
+# Relative meshdir paths break when the robot file is included from another folder.
+def find_mesh_dir():
+    candidates = [FOLDER / "assets"] + sorted(FOLDER.parent.glob("robotis_mujoco_menagerie*"))
+    for root in candidates:
+        if (root / "waffle_pi_base.stl").exists():
+            return root
+        if root.is_dir():
+            hits = list(root.rglob("waffle_pi_base.stl"))
+            if hits:
+                return hits[0].parent
+    raise FileNotFoundError("waffle_pi_base.stl not found - copy the ROBOTIS 'assets' "
+                            "folder into the repo folder")
 
 def add_sensors_to_robot():
     tree = ET.parse(ROBOT_IN)
     root = tree.getroot()
 
+    # Point every mesh at its real file (absolute path), and drop the relative meshdir
+    mesh_dir = find_mesh_dir()
+    compiler = root.find("compiler")
+    if compiler is not None:
+        compiler.attrib.pop("meshdir", None)
+    for mesh in root.iter("mesh"):
+        mesh.set("file", (mesh_dir / Path(mesh.get("file")).name).as_posix())
 
     option = root.find("option")
     option.set("timestep", "0.002")                 # 2ms step
     option.set("integrator", "implicitfast")            # for velocity actuators - wheel motor
 
+    # Wheel motors: ROBOTIS kv=0.1 is too weak to turn on the spot against tyre scrub
+    # (torque = kv * speed error, and frictionloss 0.1 N m eats the first 1 rad/s of error).
+    # kv=1.0 tracks speed to ~0.1 rad/s; forcerange caps torque near the Dynamixel
+    # XM430's real output so the motor isn't unrealistically strong.
+    wheel_vel = root.find(".//default[@class='wheel']/velocity")
+    wheel_vel.set("kv", "1.0")
+    wheel_vel.set("forcerange", "-1.5 1.5")
+
+    # Tyres: replace the ROBOTIS mesh collision with a primitive cylinder (r = 0.033 m).
+    # A mesh tyre collides as its convex hull and scrubs during on-the-spot turns, so
+    # the wheels slip and odometry over-counts the turn. A cylinder gives clean rolling
+    # contact. The wheel body's z axis is the spin axis, which is also the cylinder axis.
+    for wheel in ("wheel_left", "wheel_right"):
+        body = root.find(f".//body[@name='{wheel}']")
+        for g in list(body.findall("geom")):
+            if g.get("class") == "collision":
+                body.remove(g)
+        ET.SubElement(body, "geom", name=f"{wheel}_tyre", type="cylinder",
+                      size="0.033 0.009", group="3", condim="3", friction="1.0 0.005 0.0001")
+    
     base = root.find(".//body[@name='base']")       # robot body called base
     base.set("pos", f"{START_X} {START_Y} 0")           # spawn at start point (default 0,0 is in walls)
+
+    # Chassis collision hull: the convex hull of waffle_pi_base.stl reaches the floor
+    # and drags, so the wheels slip. Bit 2 only: it still hits obstacles (bits 1+2,
+    # set in make_scene) but not the floor (bit 1). The casters carry the rear as on
+    # the real robot.
+    for g in base.findall("geom"):
+        if g.get("class") == "collision" and g.get("mesh") == "waffle_pi_base":
+            g.set("contype", "2")
+            g.set("conaffinity", "2")
+
+    # Caster spheres: ROBOTIS gives them friction 0.0001 and condim 1, but MuJoCo
+    # combines contact settings with the floor by taking the max, so they end up
+    # with friction 1.0 and condim 3 and drag like rubber feet. priority="1" makes
+    # the caster's own (near-frictionless) settings win against the floor.
+    for g in base.findall("geom"):
+        if g.get("type") == "sphere":
+            g.set("priority", "1")
 
     # MuJoCo camera looks along -z and +y axis, need to look along +x
     ET.SubElement(base, "camera", name="cam", pos=f"{CAMERA_POS[0]} {CAMERA_POS[1]} {CAMERA_POS[2]}", 
@@ -103,7 +160,8 @@ def make_scene():
         sx, sy, sz = (x1-x0)/2, (y1-y0)/2, h/2          # half-sizes
 
         boxes += (f'  <geom name="{name}" type="box" pos="{cx} {cy} {sz}" '
-                  f'size="{sx} {sy} {sz}" rgba="0.8 0.8 0.85 1" group="0"/>\n')
+                  f'size="{sx} {sy} {sz}" rgba="0.8 0.8 0.85 1" group="0" '
+                  f'contype="3" conaffinity="3"/>\n')
 
     half = MARKER_TOTAL / 2             # MuJoCo plane sizes are half-widths
     dock_y = MARKER_Y - DOCK_POSITION
