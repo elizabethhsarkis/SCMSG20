@@ -94,10 +94,11 @@ def simulate(start = (3.325,1.6,np.pi/2)):
             log["t"].append(t)
             log["e"].append(e)
             log["sigma"].append(np.sqrt(np.diag(ekf.P)))
-        lg = {key: np.array(val) for key, val in log.items()}
-        lg["x_true"] = true_pose(data)
-        lg["x_est"] = ekf.x.copy()
-        return lg
+
+    lg = {key: np.array(val) for key, val in log.items()}
+    lg["x_true"] = true_pose(data)
+    lg["x_est"] = ekf.x.copy()
+    return lg
 
 if __name__ == "__main__":
     lg = simulate()
