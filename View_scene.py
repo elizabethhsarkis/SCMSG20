@@ -95,12 +95,32 @@ if __name__ == "__main__":
     data.ctrl[left] = 2.8
     data.ctrl[right] = 3.2
 
-    with mujoco.viewer.launch_passive(model, data) as viewer:
-        while viewer.is_running():
-            step_start = time.time()
-            mujoco.mj_step(model, data)
-            viewer.sync()
+    # with mujoco.viewer.launch_passive(model, data) as viewer:
+    #     while viewer.is_running():
+    #         step_start = time.time()
+    #         mujoco.mj_step(model, data)
+    #         viewer.sync()
 
-            wait = model.opt.timestep - (time.time() - step_start)
-            if wait > 0:
-                time.sleep(wait)
+    #         wait = model.opt.timestep - (time.time() - step_start)
+    #         if wait > 0:
+    #             time.sleep(wait)
+    SPEED = 4.0          # 1.0 = real time, 4.0 = four times faster; raise it as high as your laptop allows
+    FPS = 60             # screen redraws per second; the physics still steps every 2 ms
+
+    try:
+        with mujoco.viewer.launch_passive(model, data) as viewer:
+            while viewer.is_running():
+                frame_start = time.time()
+
+                # advance SPEED/FPS seconds of simulation, then draw once
+                sim_target = data.time + SPEED / FPS
+                while data.time < sim_target:
+                    mujoco.mj_step(model, data)
+                viewer.sync()
+
+                # only sleep if we're ahead of the requested speed
+                wait = 1 / FPS - (time.time() - frame_start)
+                if wait > 0:
+                    time.sleep(wait)
+    except KeyboardInterrupt:
+        print("Viewer stopped")
