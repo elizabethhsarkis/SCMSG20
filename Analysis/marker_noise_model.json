@@ -1,0 +1,9 @@
+{
+  "range_bias_c": 0.0059235052295662964,
+  "bearing_bias": 0.0008667271449053811,
+  "range_a": 0.002,
+  "range_b": 0.0037497825135121877,
+  "bearing_a": 0.0017453292519943296,
+  "bearing_b": 0.0,
+  "note": "corrected range = range - range_bias_c * range^2, corrected bearing = bearing - bearing_bias; then sigma_range = range_a + range_b * r^2 [m], sigma_bearing = bearing_a + bearing_b * r [rad]. Fitted on clean simulated detections binned by true range"
+}
