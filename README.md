@@ -1,3 +1,18 @@
+# Bedside Medication Delivery Robot (41014 Integrated Project)
+**Group:** Project 20
+
+**Track:** A 
+
+# Members
+Jasmine Gilligan:          Simulation and Sensing (Part B)
+
+Brady McPhee:               Modelling and Estimation (Part A, C)
+
+Elizabeth Sarkis:           Control, Integration (Part A, D, E)
+
+**Demo Video**: _[insert link]_
+
+
 # INSTALL
 
 Install the required Python packages by running:
