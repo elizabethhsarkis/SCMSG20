@@ -1,5 +1,6 @@
 # =====================================================================================#
 # ward_paeds.py - the paediatric ward: 4 beds, a marker at every bedside, a charging dock
+# developed alongside Claude (based on my initial ward) to show a visually appealing system
 # =====================================================================================#
 #Build_scene.py loads this when the ward is "paeds" (the default). it holds:
 #   1. the layout numbers, under the same names the classic ward uses, so every other
