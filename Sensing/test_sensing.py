@@ -23,7 +23,7 @@ from Build_scene import OBSTACLES, ROOM_X, ROOM_Y, WALL_THICKNESS
 from Sensing.record_run import record, load_run, DEFAULT_LOG
 from Sensing.lidar_map import OccupancyGrid
 
-
+cd
 def obstacle_rects():
     """Ground-truth (name, x0, y0, x1, y1) of the walls and obstacles, for plotting only."""
     t = WALL_THICKNESS
