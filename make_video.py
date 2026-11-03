@@ -1,5 +1,6 @@
 
 # make_video.py was made to film the medication round and save pictures of the ward
+# Developed alongside Claude to allow for automated video recording
 
 #run from the repo folder (after python Build_scene.py)
 #what the video shows:
