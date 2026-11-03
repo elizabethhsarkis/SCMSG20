@@ -52,11 +52,9 @@
         <div class="column has-text-centered">
           <h1 class="title is-1 publication-title">Bedside Medication Delivery Robot</h1>
           <div class="is-size-5 publication-authors">
-            <span class="author-block">Jasmine Gilligan, </span>span>
+            <span class="author-block">Jasmine Gilligan,</span>span>
             <span class="author-block">Brady Mcphee,</span>span>
             <span class="author-block">Elizabeth Sarkis</span>span>
-            <span class="author-block">
-              <a href="http://sofienbouaziz.com">Sofien Bouaziz</a><sup>2</sup>,
           </div>
 
           <div class="is-size-5 publication-authors">
@@ -80,18 +78,8 @@
               <span class="link-block">
                 <a href="[GITHUB REPO LINK]"
                    class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span class="icon"><i class="fab fa-github"></i></span>
                   <span>Code</span>
-                </a>
-              </span>
-              <!-- Video Link. -->
-              <span class="link-block">
-                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                  </span>
-                  <span>Video</span>
                 </a>
               </span>
               <!-- Results Link. -->
@@ -112,18 +100,33 @@
   </div>
 </section>
 
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <video id="teaser" autoplay muted loop playsinline height="100%">
-        <source src="./static/videos/teaser.mp4"
-                type="video/mp4">
-      </video>
-      <h2 class="subtitle has-text-centered">
-        <span class="dnerf">Nerfies</span> turns selfie videos from your phone into
-        free-viewpoint
-        portraits.
-      </h2>
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="containter">
+      <video id="results-carousel" class="carousel results-carousel">
+        <div class"item">
+          <img src="./static/images/delivery_result.png" alt="Planned path, EKF estimate and true path for one delivery">
+          <p>One delivery: planned path (green), EKF estimate (blue), true path (orange).</p>
+        </div>
+        <div class="item">
+          <img src="./static/images/trials_summary.png" alt="Success rate and docking error across 15 conditions">
+          <p>15 conditions, 10 trials each, the same start poses in every condition.</p>
+        </div>
+        <div class="item">
+          <img src="./static/images/marker_noise_paeds.png" alt="Marker range and bearing error against distance and viewing angle">
+          <p>Marker detection error, measured instead of assumed.</p>
+        </div>
+        <div class="item">
+          <img src="./static/images/consistency_sweep.png" alt="EKF consistency against process noise">
+          <p>EKF tuning: process noise against NEES consistency.</p>
+        </div>
+        <div class="item">
+          <img src="./static/images/weight_sweep.png" alt="LQR tracking error against control effort">
+          <p>LQR weight sweep: tracking error against control effort.</p>
+        </div>
+        <div class="item">
+          <img src="./static/images/observability.png" alt="The direction a single marker cannot observe">
+          <p>The one direction a single marker cannot observe.</p>
     </div>
   </div>
 </section>
