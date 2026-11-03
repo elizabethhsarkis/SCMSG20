@@ -1,6 +1,0 @@
-__pycache__/
-*.pyc
-.venv/
-ward_scene.xml
-turtlebot3_waffle_pi_cam.xml
-cam_check.png
