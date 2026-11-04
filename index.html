@@ -93,7 +93,7 @@
             <div class="publication-links">
               <!-- Video Link. -->
               <span class="link-block">
-                <a href="[YOUTUBE LINK]"
+                <a href="https://www.youtube.com/watch?v=0e9fC8Xlu9E"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon"><i class="fab fa-youtube"></i></span>
                   <span>Demo video</span>
@@ -205,12 +205,64 @@
       <div class="column is-four-fifths">
         <h2 class="title is-3">Demo Video</h2>
         <div class="publication-video">
-          <iframe src="link required"
+          <iframe src="https://www.youtube.com/watch?v=0e9fC8Xlu9E"
                   frameborder="0" allow="autoplay; encrypted-media" allowfullscreen title="Bedsite Medication Delivery Robot demo"></iframe>
         </div>
       </div>
     </div>
     <!--/ Demo video. -->
+  </div>
+</section>
+
+<section class="section" id="model">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">State-space model</h2>
+    <div class="content has-text-justified">
+      <p>
+        State $\mathbf{x} = [x,\ y,\ \theta]^\top$, the position and heading of the wheel-axle midpoint
+        in the world frame. Input $\mathbf{u} = [\Delta\phi_R,\ \Delta\phi_L]^\top$, the wheel angle
+        change per 20 ms step from the encoders. Wheel radius $r = 0.033$ m, wheel separation $b = 0.288$ m.
+      </p>
+      <p>
+        $$\Delta s = \tfrac{r}{2}(\Delta\phi_R + \Delta\phi_L), \qquad
+          \Delta\theta = \tfrac{r}{b}(\Delta\phi_R - \Delta\phi_L), \qquad
+          \varphi = \theta + \tfrac{\Delta\theta}{2}$$
+        $$x^+ = x + \Delta s\cos\varphi, \qquad y^+ = y + \Delta s\sin\varphi, \qquad \theta^+ = \theta + \Delta\theta$$
+      </p>
+      <p>
+        Process noise: wheel variance $k\lvert\Delta\phi\rvert$ per wheel, so $Q = L\,\Sigma_u L^\top$.
+        Measurement of a marker at $(m_x, m_y)$, with $d_x, d_y$ the marker position minus the robot position:
+        $$\mathbf{z} = \left[\sqrt{d_x^2 + d_y^2},\ \operatorname{atan2}(d_y, d_x) - \theta\right]^\top$$
+      </p>
+      <h3 class="title is-5">Assumptions</h3>
+      <ul>
+        <li>The floor is flat, so the robot moves only in the plane.</li>
+        <li>The wheels roll without slipping; small slip is process noise. This was measured, not assumed (Sensing).</li>
+        <li>Wheel radius and separation are known and fixed.</li>
+        <li>The reference point is the axle midpoint, checked against the model at start-up.</li>
+        <li>Wheel speeds are constant within each 20 ms step.</li>
+        <li>Encoder noise is zero-mean Gaussian, independent between wheels, growing with how far each wheel turns.</li>
+        <li>Marker positions are known exactly; the camera-to-robot offset is known.</li>
+        <li>Motor dynamics are ignored, because encoder readings are the input.</li>
+      </ul>
+      <h3 class="title is-5">Controllability and observability</h3>
+      <p>[Rank tests on the linearised model; which states one marker observes, and what happens when no marker is in view.]</p>
+      <img src="./static/images/observability.png" alt="Single-marker observability analysis">
+    </div>
+ 
+    <h2 class="title is-3" id="frames">Frames</h2>
+    <div class="content has-text-justified">
+      <img src="./static/images/frames.png" alt="Frame diagram from marker to camera to robot base to world">
+      <p class="figure-caption">
+        Marker → camera (OpenCV) → camera (MuJoCo) → robot base → world.
+      </p>
+      <p>
+        The camera sits 0.0855 m ahead of and 0.107 m above the axle midpoint, looking along the robot's
+        forward axis; the LiDAR sits 0.049 m behind it at 0.1255 m. Every transform lives in one shared
+        file, <code>frames.py</code>, built from the same constants that generate the scene, so the code and
+        the simulation cannot disagree.
+      </p>
+    </div>
   </div>
 </section>
 
