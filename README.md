@@ -12,7 +12,7 @@ Brady McPhee:               Modelling and Estimation (Part A, C)
 
 Elizabeth Sarkis:           Control, Integration (Part A, D, E)
 
-**Demo Video**: _[insert link]_
+**Demo Video**: https://youtu.be/0e9fC8Xlu9E
 
 
 # INSTALL
