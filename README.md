@@ -1,6 +1,8 @@
 # Bedside Medication Delivery Robot (41014 Integrated Project)
 **Group:** Project 20
 
+**Website Link** https://elizabethhsarkis.github.io/SCMSG20/
+
 **Track:** A 
 
 # Members
@@ -224,3 +226,7 @@ The files Build_scene.py, ward_paeds.py and ward_select.py define the two ward l
 The file make_video.py creates the videos and images used to show the robot's movement and performance.
 
 In the paediatric ward, all decorations are placed in MuJoCo geometry group 2, with collisions disabled. The LiDAR also ignores this group. This means decorations such as toys, plants and the mural do not affect the robot's sensor readings or movement.
+
+## AI Declaration
+
+The 'make video' and 'paediatric ward' were developed alongside Claude.AI. None of this affected the analysis or actual content of our system, these files were instead used to enhance visual appearance of runs and allow for automated video recordings.
