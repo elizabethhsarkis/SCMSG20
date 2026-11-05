@@ -4,27 +4,16 @@
   <meta charset="utf-8">
   <meta name="description"
         content="A TurtleBot3 in MuJoCo delivers medication across a paediatric ward, localising with an EKF and tracking its route with LQR.">
-  <meta name="keywords" content="TurtleBot3, MuJoCo, EKF, LQR, ArUco, LiDAR, occupany grid">
+  <meta name="keywords" content="TurtleBot3, MuJoCo, EKF, LQR, ArUco, LiDAR, occupancy grid">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bedside Medication Delivery System</title>
 
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-        rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <!-- <link rel="stylesheet" href="./static/css/bulma-slider.min.css"> -->
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-  <!-- <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"> -->
   <link rel="stylesheet" href="./static/css/index.css">
   <link rel="icon" href="./static/images/favicon.svg">
-
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script> -->
   
   <style>
     /* Small additions for this page; everything else is the template's index.css */
@@ -44,9 +33,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script src="./static/js/bulma-carousel.min.js"></script>
-  <!-- index.js removed: it preloads the Nerfies interpolation frames, which this page doesn't use.
-       The two things we still need from it (carousel and mobile menu) are at the bottom of the page. -->
-  
 </head>
 <body>
 
@@ -62,7 +48,11 @@
     <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
       <a class="navbar-item" href="#overview">Overview</a>
       <a class="navbar-item" href="#model">Model</a>
+      <a class="navbar-item" href="#sensing">Sensing</a>
+      <a class="navbar-item" href="#estimation">Estimation</a>
+      <a class="navbar-item" href="#control">Control</a>
       <a class="navbar-item" href="#results">Results</a>
+      <a class="navbar-item" href="#reproduce">Run it</a>
       <a class="navbar-item" href="#contributions">Contributions</a>
     </div>
   </div>
@@ -82,10 +72,10 @@
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block">41014 Sensors and Control, University of Technology Sydney,</span>
+            <span class="author-block">41014 Sensors and Control, University of Technology Sydney</span>
           </div>
           <div class="is-size-6 publication-authors">
-             <span class="author-block">Group 20</span>
+             <span class="author-block">Group 20</span><br>
              <span class="author-block">Customised Track A: TurtleBot3 Waffle Pi in MuJoCo</span>
           </div>
 
@@ -112,8 +102,7 @@
                 <a href="#results"
                    class="button is-normal is-rounded is-dark">
                   <span class="icon">
-                      <i class="fab fa-chart-bar"></i>
-                  </span>
+                      <i class="fas fa-chart-bar"></i></span>
                   <span>Results</span>
                   </a>
               </span>
@@ -141,15 +130,15 @@
   
   <section class="hero is-light is-small">
   <div class="hero-body">
-    <div class="containter">
-      <video id="results-carousel" class="carousel results-carousel">
-        <div class"item">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item">
           <img src="./static/images/delivery_result.png" alt="Planned path, EKF estimate and true path for one delivery">
           <p>One delivery: planned path (green), EKF estimate (blue), true path (orange).</p>
         </div>
         <div class="item">
           <img src="./static/images/trials_summary.png" alt="Success rate and docking error across 15 conditions">
-          <p>15 conditions, 10 trials each, the same start poses in every condition.</p>
+          <p>Classic ward: 15 conditions, 10 trials each, the same start poses in every condition.</p>
         </div>
         <div class="item">
           <img src="./static/images/marker_noise_paeds.png" alt="Marker range and bearing error against distance and viewing angle">
@@ -157,7 +146,7 @@
         </div>
         <div class="item">
           <img src="./static/images/consistency_sweep.png" alt="EKF consistency against process noise">
-          <p>EKF tuning: process noise against NEES consistency.</p>
+          <p>EKF tuning: process noise against NEES consistency, fitted against fixed R.</p>
         </div>
         <div class="item">
           <img src="./static/images/weight_sweep.png" alt="LQR tracking error against control effort">
@@ -187,8 +176,12 @@
             that fuses wheel-encoder odometry with range and bearing to the ArUco markers.
           </p>
           <p>
-            This customised Track A project meets each requirement of the brief:
+            We built two wards. The <strong>classic ward</strong> (6 × 4 m, two beds, one bedside marker and a
+            trolley) is where each subsystem was tested and where the robustness trials run. The
+            <strong>paediatric ward</strong> is the full delivery task, with a marker at each of four bedsides and
+            at the charging dock.
           </p>
+          <p>This customised Track A project meets each requirement of the brief:</p>
           <ul>
             <li><strong>State-space model</strong> of the differential-drive robot, derived for this platform (Model).</li>
             <li><strong>EKF</strong> fusing encoder odometry with camera range and bearing (Estimation).</li>
@@ -205,8 +198,9 @@
       <div class="column is-four-fifths">
         <h2 class="title is-3">Demo Video</h2>
         <div class="publication-video">
-          <iframe src="https://www.youtube.com/watch?v=0e9fC8Xlu9E"
-                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen title="Bedsite Medication Delivery Robot demo"></iframe>
+          <iframe src="https://www.youtube.com/embed/0e9fC8Xlu9E?rel=0"
+                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+                  title="Bedside Medication Delivery Robot demo"></iframe>
         </div>
       </div>
     </div>
@@ -230,8 +224,9 @@
         $$x^+ = x + \Delta s\cos\varphi, \qquad y^+ = y + \Delta s\sin\varphi, \qquad \theta^+ = \theta + \Delta\theta$$
       </p>
       <p>
-        Process noise: wheel variance $k\lvert\Delta\phi\rvert$ per wheel, so $Q = L\,\Sigma_u L^\top$.
-        Measurement of a marker at $(m_x, m_y)$, with $d_x, d_y$ the marker position minus the robot position:
+        Process noise: wheel variance $k\lvert\Delta\phi\rvert$ per wheel, so $Q = L\,\Sigma_u L^\top$, plus a
+        small extra term tuned for consistency (Estimation). Measurement of a marker at $(m_x, m_y)$, with
+        $d_x, d_y$ the marker position minus the robot position:
         $$\mathbf{z} = \left[\sqrt{d_x^2 + d_y^2},\ \operatorname{atan2}(d_y, d_x) - \theta\right]^\top$$
       </p>
       <h3 class="title is-5">Assumptions</h3>
@@ -245,9 +240,32 @@
         <li>Marker positions are known exactly; the camera-to-robot offset is known.</li>
         <li>Motor dynamics are ignored, because encoder readings are the input.</li>
       </ul>
-      <h3 class="title is-5">Controllability and observability</h3>
-      <p>[Rank tests on the linearised model; which states one marker observes, and what happens when no marker is in view.]</p>
+      
+      <h3 class="title is-5">Observability</h3>
+      <p>
+        One range-and-bearing reading gives a measurement Jacobian $H$ of rank 2, so one direction of the
+        three-dimensional pose is invisible to it. With no marker in view nothing measures the absolute pose
+        (rank 0): odometry only integrates, and the uncertainty grows. Along the real route, the windowed
+        observability Gramian over 2 s of readings reaches rank 2 once the marker is in view and never rank 3.
+        Its weak direction matches <em>rotation about the marker</em>: rotating position and heading together
+        about the marker changes no wheel or marker reading. A route rotated 6° about the marker produces
+        identical readings to the real one. Only the known start pose, carried by odometry, pins that
+        direction down, and odometry drifts. The paediatric ward's multiple markers break this symmetry
+        whenever two are in view.
+      </p>
       <img src="./static/images/observability.png" alt="Single-marker observability analysis">
+ 
+      <h3 class="title is-5">Controllability</h3>
+      <p>
+        The tracker works on the error between the robot and a reference "ghost" robot, $e = [e_1, e_2, e_3]$
+        (ghost ahead, ghost to the left, heading difference), with
+        $$A = \begin{bmatrix} 0 & \omega_g & 0 \\ -\omega_g & 0 & v_g \\ 0 & 0 & 0 \end{bmatrix}, \qquad
+          B = \begin{bmatrix} 1 & 0 \\ 0 & 0 \\ 0 & 1 \end{bmatrix}.$$
+        $[B,\ AB,\ A^2B]$ has rank 3 while the ghost moves, but rank 2 when $v_g = 0$: a stopped robot cannot
+        fix a sideways error. Two design choices follow. The gains are linearised about at least 0.05 m/s,
+        and every stop ends with a straight, head-on approach, so any sideways error is gone before the robot
+        slows down.
+      </p>
     </div>
  
     <h2 class="title is-3" id="frames">Frames</h2>
@@ -266,11 +284,321 @@
   </div>
 </section>
 
+<section class="section" id="sensing">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Sensing</h2>
+    <div class="content has-text-justified">
+      <p>
+        All sensor data passes through one driver layer, <code>Sensing/driver.py</code>, the only code that
+        touches MuJoCo. Moving to the real robot would mean replacing that one file. The control loop runs at
+        50 Hz; the camera is read at 10 Hz and the LiDAR at 5 Hz, the LDS-01's spin rate.
+      </p>
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth">
+          <thead><tr><th>Sensor</th><th>Model</th><th>Value</th><th>Where the value comes from</th></tr></thead>
+          <tbody>
+            <tr><td>Wheel encoders</td><td>variance $k\lvert\Delta\phi\rvert$ per wheel, quantised</td><td>$k = 10^{-4}$ rad²/rad; 4096 counts/rev</td><td>Matched to the EKF process noise; Dynamixel XM430 resolution</td></tr>
+            <tr><td>LiDAR (LDS-01)</td><td>360 beams at 1°, 0.12–3.5 m</td><td>σ = 7.5 mm below 0.5 m, 2.5% of range above</td><td>Data sheet accuracy taken as 2σ (assumption)</td></tr>
+            <tr><td>Camera (Pi Camera v2)</td><td>Pinhole, 640 × 480</td><td>fovy 48.8°, f = 529 px</td><td>Camera specification</td></tr>
+            <tr><td>Degraded camera (trials)</td><td>Blur, darkening, pixel noise</td><td>Blur 1.2 px, brightness ×0.75, σ = 8 grey levels</td><td>Assumption</td></tr>
+          </tbody>
+        </table>
+      </div>
+ 
+      <h3 class="title is-5">Marker measurement</h3>
+      <p>
+        The camera finds each ArUco marker's corners with sub-pixel refinement; solvePnP gives the marker's
+        position in the camera frame, which is chained into the robot base before computing range and bearing.
+        Without that step the 8.55 cm camera offset would put an 8.5 cm error into every docking reading. The
+        camera is only rendered when the EKF's own estimate says a marker could be in view.
+      </p>
+ 
+      <h3 class="title is-5">Marker noise model</h3>
+      <img src="./static/images/marker_noise_paeds.png" alt="Marker range and bearing error">
+      <p>
+        Measured at known poses, 0.4–3 m from the marker and up to 60° off its face (285 poses in the classic
+        ward, 370 in the paediatric ward). The range error has a bias that grows with range squared, which is
+        what a constant pixel error at the corners produces through PnP: about 0.006 $r^2$, or 5 cm at 3 m. It
+        is removed before the EKF sees the reading. The remaining scatter rises from under 2 mm at 0.4 m to
+        about 35 mm at 3 m, fitted as $\sigma_r = a + b\,r^2$ with $b \approx 0.004$ in both wards. Bearing
+        scatter is at most 0.08°, below the 0.1° floor we keep on $\sigma_\beta$.
+      </p>
+      <p>
+        In the classic ward only 58% of calibration poses saw the marker: from oblique positions beyond about
+        2 m the beds block it. In the paediatric ward 99% did. Degraded images raise the range scatter at 3 m
+        from 33 to 56 mm in the paediatric ward.
+      </p>
+ 
+      <h3 class="title is-5">Simulator validation</h3>
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth">
+          <thead><tr><th>Model version</th><th>Straight ratio</th><th>Turn ratio</th><th>Effective r</th><th>Effective b</th></tr></thead>
+          <tbody>
+            <tr><td>Original ROBOTIS model</td><td>0.851</td><td>0.702</td><td>0.0281 m</td><td>0.410 m</td></tr>
+            <tr><td>+ motor gain, cylinder tyres, chassis kept off the floor</td><td>0.856</td><td>0.698</td><td>0.0282 m</td><td>0.413 m</td></tr>
+            <tr><td>+ caster contact priority</td><td><strong>0.996</strong></td><td><strong>0.995</strong></td><td>0.0329 m</td><td>0.289 m</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Odometry against ground truth showed the robot travelling 15% less than its wheels said, and turning
+        30% less. Contact forces traced it to the casters: MuJoCo combines two surfaces' friction by taking the
+        larger value, so the floor's friction of 1 overrode the casters' 0.0001 and they dragged. Giving the
+        casters contact priority fixed it. <code>Sensing/calibrate_odometry.py</code> and
+        <code>Sensing/diagnose_*.py</code> reproduce each step.
+      </p>
+ 
+      <h3 class="title is-5">Sensing test (classic ward)</h3>
+      <img src="./static/images/sensing_test.png" alt="LiDAR map, dead reckoning, and marker range and bearing against truth">
+      <p class="figure-caption">
+        (a) LiDAR occupancy map against the true obstacle outlines; (b) encoder dead reckoning against the true
+        path; (c, d) measured marker range and bearing against truth.
+      </p>
+      <p>
+        Range bias +0.43 cm (std 0.51 cm) and bearing bias +0.05° (std 0.02°) over 267 detections; 100%
+        detection whenever the marker was unobstructed; 2.9 cm dead-reckoning error after about 5 m. LiDAR scans
+        build a 5 cm log-odds occupancy grid at the EKF's estimated pose.
+      </p>
+    </div>
+  </div>
+</section>
+ 
+ 
+<section class="section" id="estimation">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Estimation</h2>
+    <div class="content has-text-justified">
+      <p>
+        Every 20 ms the wheel encoders predict the pose, and each visible marker's range and bearing correct
+        it, with the measured bias removed and $R$ set from the noise model for that range. Over the 20
+        paediatric rounds the position RMS error was 1.4 cm.
+      </p>
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth">
+          <thead><tr><th>Parameter</th><th>Value</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Encoder noise $k$</td><td>$10^{-4}$ rad²/rad per wheel</td><td>Matches the driver's encoder model</td></tr>
+            <tr><td>Extra process noise</td><td>2 × diag(2 mm, 2 mm, 0.2°)² per second</td><td>Covers slip, rocking and linearisation error the encoder model leaves out; scale chosen by the sweep below</td></tr>
+            <tr><td>Measurement noise $R$</td><td>From the marker noise model, per reading</td><td>Measured (Sensing)</td></tr>
+            <tr><td>Initial covariance $P_0$</td><td>diag(1 cm, 1 cm, 1°)²</td><td>The robot starts on the known pharmacy pad</td></tr>
+            <tr><td>Outlier gate</td><td>NIS &gt; 9.21 rejected</td><td>χ² with 2 degrees of freedom at 1%</td></tr>
+            <tr><td>Gate recovery</td><td>After 2 rejections in a row, widen $P$ by (5 cm, 5 cm, 10°)²</td><td>Two outliers in a row at a 10% outlier rate is a 1% event, so the EKF is more likely lost than the camera wrong</td></tr>
+          </tbody>
+        </table>
+      </div>
+ 
+      <h3 class="title is-5">Consistency against responsiveness, and the value of the measured R</h3>
+      <img src="./static/images/consistency_sweep.png" alt="EKF consistency sweep">
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth is-narrow">
+          <thead><tr><th>Extra process noise scale</th><th>NEES after marker, fitted R</th><th>NIS, fitted R</th><th>NEES after marker, fixed R</th><th>NIS, fixed R</th><th>EKF RMSE, fitted (cm)</th><th>Dock error, fitted (cm)</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>28.35</td><td>0.32</td><td>4.08</td><td>0.01</td><td>1.11</td><td>0.54</td></tr>
+            <tr><td>0.5</td><td>9.74</td><td>0.20</td><td>3.06</td><td>0.01</td><td>1.11</td><td>0.50</td></tr>
+            <tr><td>1</td><td>5.06</td><td>0.12</td><td>1.80</td><td>0.01</td><td>1.12</td><td>0.50</td></tr>
+            <tr><td><strong>2 (chosen)</strong></td><td><strong>2.36</strong></td><td><strong>0.07</strong></td><td>0.71</td><td>0.01</td><td>1.12</td><td>0.50</td></tr>
+            <tr><td>4</td><td>1.05</td><td>0.03</td><td>0.22</td><td>0.00</td><td>1.12</td><td>0.51</td></tr>
+            <tr><td>8</td><td>0.52</td><td>0.02</td><td>0.07</td><td>0.00</td><td>1.12</td><td>0.51</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Classic ward, 3 seeds per point. Without extra process noise the filter is badly overconfident once the
+        marker is seen (NEES 28 against an ideal 3). A scale of 2 brings NEES to 2.4 with no loss of accuracy:
+        position RMSE stays at 1.1 cm and docking error at 0.5 cm across the whole sweep, so the trade-off here
+        is consistency, not accuracy. The assumed fixed $R$ (2 cm + 1% of range, 2°) makes the filter
+        underconfident at every scale (NIS 0.01); the measured model is closer to consistent, though still
+        cautious (NIS 0.07 against an ideal 2) because of the 0.1° bearing floor.
+      </p>
+    </div>
+  </div>
+</section>
+ 
+ 
+<section class="section" id="control">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Navigation and control</h2>
+    <div class="content has-text-justified">
+      <p>
+        A* (8-connected) finds the shortest path through the LiDAR map, inflated by the robot's radius plus a
+        safety margin. The path is shortcut wherever a straight line is clear, then rounded with Chaikin
+        smoothing; if smoothing clips an obstacle, fewer rounds are used. Each stop ends with a 0.8 m straight,
+        head-on approach. Cells the LiDAR has never seen count as free, and the robot replans when a scan
+        shows its path blocked.
+      </p>
+      <p>
+        A "ghost" robot drives the path at a speed that respects the robot's limits, giving a timed reference.
+        A discrete-time LQR (zero-order hold, 20 ms) keeps the robot on the ghost, with the gains recomputed every
+        step for the ghost's current speed and turning rate. The command is feedforward (what the ghost does)
+        plus the LQR correction. Within 0.5 m of a stop the weights switch to strict docking values.
+      </p>
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth">
+          <thead><tr><th>Parameter</th><th>Value</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>LQR weights across the ward</td><td>Accept 10 cm, 10 cm, 0.3 rad; corrections up to 0.1 m/s and 1 rad/s</td><td>Bryson's rule: weight = 1 / (largest acceptable value)²</td></tr>
+            <tr><td>LQR weights at the bedside</td><td>Accept 2 cm, 2 cm, 0.1 rad; corrections up to 0.05 m/s and 0.5 rad/s</td><td>Strict position, gentle corrections for docking</td></tr>
+            <tr><td>Gain switch distance</td><td>0.5 m from the stop</td><td>[reason]</td></tr>
+            <tr><td>Ghost speed</td><td>0.18 m/s top, 0.05 m/s over the last 0.5 m</td><td>Crawl at the bedside so the dock tolerance is reachable</td></tr>
+            <tr><td>Ghost acceleration and turn rate</td><td>0.25 m/s², 1.0 rad/s</td><td>[reason]</td></tr>
+            <tr><td>Wheel headroom</td><td>Outer wheel kept under 85% of its limit</td><td>Leaves room for the LQR's corrections on curves</td></tr>
+            <tr><td>Robot limits</td><td>0.26 m/s, 1.8 rad/s</td><td>Waffle Pi wheel speed limit (7.88 rad/s × 0.033 m)</td></tr>
+            <tr><td>Planner inflation</td><td>0.22 m radius + 0.08 m margin</td><td>The robot never follows the plan perfectly</td></tr>
+            <tr><td>Linearisation floor</td><td>0.05 m/s</td><td>Avoids the rank-2 model at $v = 0$</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Sweeping the weights by factors of 0.03 to 30 kept tracking error near 0.3 cm while control effort grew
+        fivefold, so the weights sit at the knee of that curve. The remaining error comes from the position
+        estimate, not the steering.
+      </p>
+      <img src="./static/images/weight_sweep.png" alt="LQR weight sweep">
+    </div>
+  </div>
+</section>
+ 
+ 
+<section class="section" id="results">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Results</h2>
+    <div class="content has-text-justified">
+      <h3 class="title is-5">The paediatric round</h3>
+      <p>
+        Ten full rounds per condition from random start poses, each visiting four bedsides and docking at the
+        charging station: 20 rounds and 100 stops in total. Every round succeeded. Across all 100 stops the mean
+        stop error was 0.39 cm and the worst was 1.02 cm, with no stop more than 1.5° off heading. With the
+        trolley moved across the route, the robot replanned and still docked within 1 cm every time.
+      </p>
+      <img src="./static/images/trials_summary_paeds.png" alt="Paediatric round results">
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth is-narrow">
+          <thead><tr><th>Condition</th><th>Rounds</th><th>Success</th><th>Dock error mean (cm)</th><th>Dock error 95th (cm)</th><th>EKF RMSE (cm)</th><th>NEES after marker</th><th>NIS</th><th>Replans</th><th>Round time (s)</th></tr></thead>
+          <tbody>
+            <tr><td>nominal</td><td>10</td><td>100%</td><td>0.75</td><td>1.01</td><td>1.39</td><td>2.00</td><td>0.16</td><td>4.3</td><td>182</td></tr>
+            <tr><td>moved trolley</td><td>10</td><td>100%</td><td>0.74</td><td>0.89</td><td>1.33</td><td>1.70</td><td>0.16</td><td>5.7</td><td>183</td></tr>
+          </tbody>
+        </table>
+      </div>
+ 
+      <h3 class="title is-5">Robustness trials (classic ward)</h3>
+      <p>
+        Robustness trials in the classic ward. Every condition runs from the same 10 random start poses near
+        the pharmacy, so conditions are compared like for like. A trial succeeds if the robot docks within 5 cm
+        and 5° and never touches an obstacle. Every failure is traced automatically to sensing, estimation,
+        planning or control, and plotted.
+      </p>
+      <img src="./static/images/trials_summary.png" alt="Trial results summary">
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth is-narrow">
+          <thead><tr><th>Condition</th><th>Success</th><th>Dock error mean (cm)</th><th>Dock error 95th (cm)</th><th>EKF RMSE (cm)</th><th>NEES after marker</th><th>NIS</th><th>Rejected</th><th>Replans</th></tr></thead>
+          <tbody>
+            <tr><td>nominal</td><td>100%</td><td>0.50</td><td>0.57</td><td>1.74</td><td>2.16</td><td>0.07</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>moved trolley</td><td>100%</td><td>0.37</td><td>0.44</td><td>1.50</td><td>2.93</td><td>0.12</td><td>0.0</td><td>6.0</td></tr>
+            <tr><td>marker hidden (last 1 m)</td><td>100%</td><td>0.81</td><td>0.96</td><td>1.75</td><td>1.01</td><td>0.18</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>marker never seen</td><td>50%</td><td>4.90</td><td>7.12</td><td>3.58</td><td>n/a</td><td>n/a</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>LiDAR dropout (1 in 5 beams)</td><td>100%</td><td>0.49</td><td>0.67</td><td>1.47</td><td>2.29</td><td>0.07</td><td>0.0</td><td>1.4</td></tr>
+            <tr><td>encoder noise ×5</td><td>100%</td><td>0.44</td><td>0.63</td><td>2.44</td><td>2.18</td><td>0.23</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>wheel radius 2% wrong</td><td>100%</td><td>1.35</td><td>1.76</td><td>4.40</td><td>7.34</td><td>0.13</td><td>0.0</td><td>3.0</td></tr>
+            <tr><td>push 6 N</td><td>100%</td><td>0.50</td><td>0.59</td><td>1.74</td><td>2.16</td><td>0.07</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>push 9 N</td><td>100%</td><td>0.51</td><td>0.60</td><td>1.75</td><td>2.18</td><td>0.07</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>push 12 N</td><td>100%</td><td>1.19</td><td>2.14</td><td>3.13</td><td>6.80</td><td>0.10</td><td>1.1</td><td>1.7</td></tr>
+            <tr><td>push 15 N</td><td>0%</td><td>50.06</td><td>134.50</td><td>27.13</td><td>372.67</td><td>0.38</td><td>0.9</td><td>1.7</td></tr>
+            <tr><td>push 15 N, no gate recovery</td><td>0%</td><td>52.20</td><td>134.50</td><td>27.29</td><td>554.54</td><td>0.45</td><td>4.7</td><td>1.7</td></tr>
+            <tr><td>degraded camera</td><td>100%</td><td>0.48</td><td>0.56</td><td>1.73</td><td>1.01</td><td>0.07</td><td>0.0</td><td>1.9</td></tr>
+            <tr><td>outliers (1 in 10), gated</td><td>100%</td><td>0.50</td><td>0.57</td><td>1.74</td><td>1.87</td><td>0.07</td><td>13.8</td><td>1.9</td></tr>
+            <tr><td>outliers (1 in 10), ungated</td><td>10%</td><td>10.87</td><td>19.72</td><td>10.69</td><td>1724.90</td><td>974.17</td><td>0.0</td><td>1.9</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="figure-caption">All pushes are sideways, 0.3 s long, 8 s into the route.</p>
+ 
+      <h3 class="title is-5">Failures and their causes</h3>
+      <ul>
+        <li><strong>Marker never seen (5/10 failed):</strong> the robot docked on wheel odometry alone and ended 5–7 cm off. This measures the camera's value: success falls from 100% to 50% and docking error rises tenfold.</li>
+        <li><strong>15 N push (10/10 failed):</strong> the push exceeds the friction the tyres can hold, so the robot slides; the encoders cannot see a slide. In most runs the estimate was 23–83 cm off before a marker came into view; in two, the filter was confidently wrong and rejected genuine readings; one docked rotated 5.7° about the marker, the direction a single marker cannot observe. Without gate recovery the gate rejected more genuine readings (4.7 per run against 0.9).</li>
+        <li><strong>Outliers without the gate (9/10 failed):</strong> bad marker readings jumped the estimate; with the gate, about 14 readings per run were rejected and every run succeeded.</li>
+        <li><strong>Wheel radius 2% wrong:</strong> every run still succeeded, but NEES rose to 7.3: a model error the filter does not know about makes it overconfident.</li>
+      </ul>
+      <img src="./static/images/fail_push_0.png" alt="A diagnosed push failure">
+ 
+      <h3 class="title is-5">Limits of the approach</h3>
+      <ul>
+        <li>Ten trials per condition is a small sample: even 10/10 only shows a success rate above about 69% with 95% confidence.</li>
+        <li>A single marker leaves rotation about it unobservable; only odometry from the known start constrains it.</li>
+        <li>A hard push slides the robot in a way no sensor reports until a marker is seen; LiDAR localisation against the walls would catch it.</li>
+        <li>The filter stays cautious (NIS 0.07 against an ideal 2) because of the 0.1° bearing floor.</li>
+        <li>Rendered images are ideal; the degraded-camera values are an assumption, not a measured camera.</li>
+        <li>LiDAR noise comes from the data sheet. Beds and trolleys are solid boxes; real beds have legs the LiDAR would see between.</li>
+        <li>The camera focal length comes from its field of view, not a checkerboard calibration.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+ 
+ 
+<section class="section" id="ground-truth">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Ground truth is used only for evaluation</h2>
+    <div class="content has-text-justified">
+      <p>
+        <code>Sensing/driver.py</code> exposes the simulator's pose only through <code>true_pose()</code>, marked
+        evaluation-only. The LQR tracker takes the EKF estimate as its only pose input
+        (<code>LQRTracker.step(pose_estimate, t)</code>), and the occupancy map is built at the estimated pose.
+        The true pose appears elsewhere only to apply disturbances (the push, a person blocking a marker), to
+        score runs, and in the marker calibration experiment, where the robot is deliberately placed at known
+        poses.
+      </p>
+    </div>
+  </div>
+</section>
+ 
+ 
+<section class="section" id="reproduce">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">Install and run</h2>
+    <p>Tested on Python 3.12, Windows 11.</p>
+    <pre><code>git clone https://github.com/elizabethhsarkis/SCMSG20.git
+cd SCMSG20
+git checkout FinalCode
+python -m venv .venv
+.venv\Scripts\activate            # macOS/Linux: source .venv/bin/activate
+python -m pip install -r requirements.txt
+ 
+python Build_scene.py             # generates the scene XML files; run this first
+python run_delivery.py            # one full paediatric round, saves delivery_result.png
+ 
+# classic-ward analysis (these scripts refuse to run in the paediatric ward)
+python Analysis/run_trials.py --ward classic           # 15 conditions, 10 trials each
+python Analysis/consistency_sweep.py --ward classic    # process noise and R sweep
+python Analysis/observability.py --ward classic        # observability figure
+python Sensing/record_run.py --ward classic            # logged sensing run
+python Sensing/test_sensing.py --ward classic          # sensing test figure
+ 
+python Analysis/marker_noise.py                        # marker calibration, paediatric ward
+python Analysis/marker_noise.py --ward classic         # marker calibration, classic ward</code></pre>
+  </div>
+</section>
+
+<section class="section" id="contributions">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">Individual contributions</h2>
+    <p><strong>Jasmine Gilligan:</strong> simulation and sensing</p>
+    <p><strong>Brady Mcphee:</strong> modelling and estimation</p>
+    <p><strong>Elizabeth Sarkis:</strong> navigation, control and integration</p>
+ 
+    <h2 class="title is-3">Generative AI declaration</h2>
+    <p>AI Declaration: The 'make video' and 'paediatric ward' were developed alongside Claude.AI. None of 
+      this affected the analysis or actual content of our system, these files were instead used to enhance 
+      visual appearance of runs and allow for automated video recordings.</p>
+  </div>
+</section>  
+  
 <footer class="footer">
   <div class="container">
     <div class="content has-text-centered">
       <a class="icon-link"
-         href="https://github.com/elizabethhsarkis/SCMSG20/tree/FinalCode" aria-label="Code on GitHub>
+         href="https://github.com/elizabethhsarkis/SCMSG20/tree/FinalCode" aria-label="Code on GitHub">
         <i class="fab fa-github"></i>
       </a>
     </div>
